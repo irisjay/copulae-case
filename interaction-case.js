@@ -1,22 +1,15 @@
-var filterObjIndexed = R .curry (function (fn, obj) {
-	var x = {};
-	R .forEachObjIndexed (function (value, key) {
-		if (fn (value, key))
-			x [key] = value;
-	}) (obj);
-	return x;
-});
-
 var set_nodes_visibility = function (value) {
     return R .cond ([
-        [R .is (NodeList), R .forEach (function (node) {
+        [function (x) {
+        	return R .is (NodeList) (x) || R .is (Array) (x)
+        }, R .forEach (function (node) {
             node .style .visibility = value;
         })],
-        [R .is (Node), function (node) {
+        [R .T, function (node) {
             node .style .visibility = value;
         }]
     ]);
-};
+}
 
 var interaction_case = function (cases) {
     return interaction (transition (function (intent, license) {
@@ -31,7 +24,7 @@ var interaction_case = function (cases) {
                     .map (filterObjIndexed (function (x, key) {
                         return key !== to
                     }))
-                    .forEach (R .forEachObjIndexed (set_nodes_visibility ('hidden')))
+                    .map (R .forEachObjIndexed (set_nodes_visibility ('hidden')))
             }
             [cases [to]] .forEach (set_nodes_visibility (''));
             tenure (to);
